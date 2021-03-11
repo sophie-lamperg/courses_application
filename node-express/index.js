@@ -1,17 +1,17 @@
 const express = require('express')
 const path = require('path')
+const csrf = require('csurf')
+const flash = require('connect-flash')
 const mongoose = require('mongoose')
 const exphbs = require('express-handlebars')
 const session = require('express-session')
 const MongoStore = require('connect-mongodb-session')(session)
-const csrf = require('csurf')
 const homeRoutes = require('./routes/home')
 const cardRoutes = require('./routes/card')
 const addRoutes = require('./routes/add')
 const ordersRoutes = require('./routes/orders')
 const coursesRoutes = require('./routes/courses')
 const authRoutes = require('./routes/auth')
-const User = require('./models/user')
 const varMiddleware = require('./middleware/variables')
 const userMiddleware = require('./middleware/user')
 const Handlebars = require('handlebars')
@@ -42,6 +42,7 @@ app.use(session({
   store
 }))
 app.use(csrf())
+app.use(flash())
 app.use(varMiddleware)
 app.use(userMiddleware)
 
@@ -52,14 +53,14 @@ app.use('/card', cardRoutes)
 app.use('/orders', ordersRoutes)
 app.use('/auth', authRoutes)
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3002
 
 async function start() {
   try {
     await mongoose.connect(MONGODB_URI, {
       useNewUrlParser: true,
       useFindAndModify: false,
-      // useUnifiedTopology: true
+      useUnifiedTopology: true
     })
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`)
